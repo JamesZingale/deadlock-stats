@@ -1,0 +1,10 @@
+var R=require("../../../chunks/[turbopack]_runtime.js")("server/app/api/fetch-matches/route.js")
+R.c("server/chunks/node_modules_next_dist_712115c9._.js")
+R.c("server/chunks/node_modules_mysql2_84e924d7._.js")
+R.c("server/chunks/node_modules_iconv-lite_a4444554._.js")
+R.c("server/chunks/node_modules_aws-ssl-profiles_lib_7ad223da._.js")
+R.c("server/chunks/node_modules_bec30ffe._.js")
+R.c("server/chunks/[root-of-the-server]__0ff5025a._.js")
+R.m("[project]/.next-internal/server/app/api/fetch-matches/route/actions.js [app-rsc] (server actions loader, ecmascript)")
+R.m("[project]/node_modules/next/dist/esm/build/templates/app-route.js { INNER_APP_ROUTE => \"[project]/src/app/api/fetch-matches/route.ts [app-route] (ecmascript)\" } [app-route] (ecmascript)")
+module.exports=R.m("[project]/node_modules/next/dist/esm/build/templates/app-route.js { INNER_APP_ROUTE => \"[project]/src/app/api/fetch-matches/route.ts [app-route] (ecmascript)\" } [app-route] (ecmascript)").exports

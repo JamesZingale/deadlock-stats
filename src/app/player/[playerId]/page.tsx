@@ -9,7 +9,7 @@ interface Player {
   total_losses: number;
 }
 
-interface Match {
+interface Match { 
   match_id: number;
   hero_id: number;
   kills: number;

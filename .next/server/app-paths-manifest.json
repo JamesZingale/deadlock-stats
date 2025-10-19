@@ -1,4 +1,4 @@
 {
-  "/_not-found/page": "app/_not-found/page.js",
-  "/api/fetch-matches/route": "app/api/fetch-matches/route.js"
+  "/api/seed-player/route": "app/api/seed-player/route.js",
+  "/favicon.ico/route": "app/favicon.ico/route.js"
 }

@@ -49,20 +49,35 @@ export default async function PlayerPage({ params }: PlayerPageProps) {
     [playerId]
   );
 
+  const boxStyle: React.CSSProperties = {
+    border: '1px solid #ccc',
+    padding: '16px',
+    margin: '10px 0',
+    borderRadius: '8px',
+    backgroundColor: '#f9f9f9',
+    boxShadow: '0 2px 4px rgba(0,0,0,0.1)'
+  };
+
   return (
     <div>
-      <h1>{player.username}</h1>
-      <p>Total Matches: {player.total_matches_played}</p>
-      <p>Total Wins: {player.total_wins}</p>
-      <p>Total Losses: {player.total_losses}</p>
+      <h1>Username: {player.username}</h1>
+      <div className="border border-gray-300 dark:border-gray-700 p-4 rounded bg-white dark:bg-neutral-900 shadow">
+        <p><strong>Total Matches:</strong> {player.total_matches_played}</p>
+        <p><strong>Total Wins:</strong> {player.total_wins}</p>
+        <p><strong>Total Losses:</strong> {player.total_losses}</p>
+      </div>
+
       <h2>Recent Matches</h2>
-      <ul>
-        {matchesRows.map((match) => (
-          <li key={match.match_id}>
-            Match {match.match_id}: K/D/A {match.kills}/{match.deaths}/{match.assists}, Damage {match.damage_done}, Healing {match.healing_done}
-          </li>
-        ))}
-      </ul>
+      {matchesRows.map((match) => (
+        <div key={match.match_id} className="border border-gray-300 dark:border-gray-700 p-4 mb-4 rounded bg-white dark:bg-neutral-900 shadow">
+          <p><strong>Match ID:</strong> {match.match_id}</p>
+          <p><strong>K/D/A:</strong> {match.kills}/{match.deaths}/{match.assists}</p>
+          <p><strong>Damage Done:</strong> {match.damage_done}</p>
+          <p><strong>Healing Done:</strong> {match.healing_done}</p>
+          <p><strong>Match Mode:</strong> {match.match_mode}</p>
+          <p><strong>Winning Team:</strong> {match.winning_team}</p>
+        </div>
+      ))}
     </div>
   );
 }

@@ -208,13 +208,10 @@ async function GET(request) {
         let matchIds = [];
         try {
             const parsed = JSON.parse(text);
-            if (parsed.rows && Array.isArray(parsed.rows)) {
-                // Map each row array to an object
-                const matchIdIndex = parsed.columns.indexOf('match_id');
-                if (matchIdIndex === -1) throw new Error('No match_id column in result');
-                matchIds = parsed.rows.map((row)=>({
-                        match_id: row[matchIdIndex]
-                    }));
+            if (Array.isArray(parsed)) {
+                matchIds = parsed;
+            } else if (parsed.rows && Array.isArray(parsed.rows)) {
+                matchIds = parsed.rows;
             } else {
                 console.warn('Unexpected match IDs response:', parsed);
             }

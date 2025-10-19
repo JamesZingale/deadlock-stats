@@ -25,8 +25,9 @@ export async function GET(request: Request) {
       }
 
       if (playerIds.length === 0) throw new Error('No active player found');
-      const randomIndex = Math.floor(Math.random() * playerIds.length);
-      accountId = playerIds[randomIndex].toString();
+    const randomIndex = Math.floor(Math.random() * playerIds.length);
+    accountId = playerIds[randomIndex].toString();
+    
     }
 
     // Step 2: Fetch hero stats for the account
@@ -76,25 +77,19 @@ export async function GET(request: Request) {
     const matchesRes2 = await fetch(matchesUrl);
     const text = await matchesRes2.text();
 
-    let matchIds: { match_id: number }[] = [];
-
+    let matchIds: any[] = [];
     try {
-    const parsed = JSON.parse(text);
-
-    if (parsed.rows && Array.isArray(parsed.rows)) {
-        // Map each row array to an object
-        const matchIdIndex = parsed.columns.indexOf('match_id');
-        if (matchIdIndex === -1) throw new Error('No match_id column in result');
-
-        matchIds = parsed.rows.map((row: any[]) => ({
-        match_id: row[matchIdIndex]
-        }));
-    } else {
+      const parsed = JSON.parse(text);
+      if (Array.isArray(parsed)) {
+        matchIds = parsed;
+      } else if (parsed.rows && Array.isArray(parsed.rows)) {
+        matchIds = parsed.rows;
+      } else {
         console.warn('Unexpected match IDs response:', parsed);
-    }
+      }
     } catch (err) {
-    console.error('Failed to parse matches JSON, raw response:', text);
-    throw new Error('Invalid JSON returned from Deadlock SQL endpoint');
+      console.error('Failed to parse matches JSON, raw response:', text);
+      throw new Error('Invalid JSON returned from Deadlock SQL endpoint');
     }
 
     // Step 6: Loop over matches and upsert into Matches and PlayerMatchStats
@@ -148,6 +143,7 @@ export async function GET(request: Request) {
         const maxHealing = Array.isArray(player['stats.player_healing'])
         ? player['stats.player_healing'].slice(-1)[0]
         : (player['stats.player_healing'] ?? 0);
+
 
       await db.query(
         `INSERT INTO PlayerMatchStats

@@ -23,4 +23,13 @@ body {
   background: var(--background);
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
+  background: var(--background);
+  background-image: linear-gradient(
+    135deg,
+    rgba(10, 10, 10, 1) 0%,
+    rgba(5, 30, 50, 0.6) 50%,
+    rgba(0, 50, 30, 0.4) 100%
+  );
+  background-size: cover;
+  background-attachment: fixed;
 }

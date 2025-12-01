@@ -11,7 +11,7 @@ interface Player {
 
 interface Match {
   match_id: number;
-  hero_id: number;
+  hero_name: string;
   kills: number;
   deaths: number;
   assists: number;

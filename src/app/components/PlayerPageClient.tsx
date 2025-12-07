@@ -31,6 +31,37 @@ interface Props {
 
 export default function PlayerPageClient({ playerInfo, matches, playerId }: Props) {
   const [compareOpen, setCompareOpen] = useState(false);
+  const [refreshingStats, setRefreshingStats] = useState(false);
+  const [refreshingMatches, setRefreshingMatches] = useState(false);
+
+  const refreshPlayerData = async () => {
+    try {
+      setRefreshingStats(true);
+      const res = await fetch(`/api/fetch-player?player_id=${playerId}`);
+      if (!res.ok) throw new Error(`API returned status ${res.status}`);
+      alert("Player stats refreshed!");
+    } catch (err) {
+      console.error(err);
+      alert("Failed to refresh player stats");
+    } finally {
+      setRefreshingStats(false);
+    }
+  };
+
+  const seedRecentMatches = async () => {
+    try {
+      setRefreshingMatches(true);
+      const res = await fetch(`/api/seed-player?account_id=${playerId}`);
+      if (!res.ok) throw new Error(`API returned status ${res.status}`);
+      const data = await res.json();
+      alert(`Seeded ${data.seededMatches} recent matches for player ${playerId}`);
+    } catch (err) {
+      console.error(err);
+      alert("Failed to seed recent matches");
+    } finally {
+      setRefreshingMatches(false);
+    }
+  };
 
   return (
     <div className="p-4">
@@ -41,12 +72,30 @@ export default function PlayerPageClient({ playerInfo, matches, playerId }: Prop
         <p><strong>Total Losses:</strong> {playerInfo.total_losses}</p>
       </div>
 
-      <button
-        onClick={() => setCompareOpen(true)}
-        className="px-3 py-1 bg-blue-600 text-white rounded mb-4"
-      >
-        Compare Sessions
-      </button>
+      <div className="flex gap-2 mb-4">
+        <button
+          onClick={refreshPlayerData}
+          className="px-3 py-1 bg-blue-600 text-white rounded"
+          disabled={refreshingStats}
+        >
+          {refreshingStats ? "Refreshing Stats..." : "Refresh Player Stats"}
+        </button>
+
+        <button
+          onClick={seedRecentMatches}
+          className="px-3 py-1 bg-green-600 text-white rounded"
+          disabled={refreshingMatches}
+        >
+          {refreshingMatches ? "Seeding Matches..." : "Seed Recent Matches"}
+        </button>
+
+        <button
+          onClick={() => setCompareOpen(true)}
+          className="px-3 py-1 bg-gray-600 text-white rounded"
+        >
+          Compare Sessions
+        </button>
+      </div>
 
       <SessionComparisonModal
         playerId={playerId}

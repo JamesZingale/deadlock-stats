@@ -5,7 +5,6 @@ const DEADLOCK_API_BASE = 'https://api.deadlock-api.com/v1/sql';
 
 export async function GET() {
   try {
-    // Example: fetch a single match for now
     const matchId = 45125446;
     const query = encodeURIComponent(
       `SELECT match_id, start_time, duration_s, match_outcome, match_mode, winning_team FROM match_info WHERE match_id = ${matchId}`

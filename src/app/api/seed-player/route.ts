@@ -95,7 +95,7 @@ export async function GET(request: Request) {
       usernameMap[profile.account_id] = profile.personaname || `Player${profile.account_id}`;
     }
 
-    // Step 5: Upsert all players into Players table
+        // Step 5: Upsert all players into Players table
     for (const playerId of uniquePlayerIds) {
       const stats = heroStatsArr.filter((h: any) => h.account_id === playerId);
       const totalMatches = stats.reduce((acc: number, h: any) => acc + (h.matches_played || 0), 0);
@@ -105,12 +105,12 @@ export async function GET(request: Request) {
 
       await db.query(
         `INSERT INTO Players (player_id, username, total_matches_played, total_wins, total_losses)
-         VALUES (?, ?, ?, ?, ?)
-         ON DUPLICATE KEY UPDATE
-           username=VALUES(username),
-           total_matches_played=VALUES(total_matches_played),
-           total_wins=VALUES(total_wins),
-           total_losses=VALUES(total_losses)`,
+        VALUES (?, ?, ?, ?, ?)
+        ON DUPLICATE KEY UPDATE
+          username = IF(Players.username IS NULL OR Players.username = '', VALUES(username), Players.username),
+          total_matches_played = VALUES(total_matches_played),
+          total_wins = VALUES(total_wins),
+          total_losses = VALUES(total_losses)`,
         [playerId, username, totalMatches, totalWins, totalLosses]
       );
     }

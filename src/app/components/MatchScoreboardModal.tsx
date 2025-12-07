@@ -1,8 +1,10 @@
-"use client";
+'use client';
 
-import { useEffect, useState } from "react";
+import { useEffect, useState } from 'react';
+import { useRouter } from 'next/navigation';
 
 interface PlayerStat {
+  player_id: number;
   username: string;
   hero_name: string;
   kills: number;
@@ -23,15 +25,19 @@ interface Props {
 
 export default function MatchScoreboardModal({ matchId, isOpen, onClose }: Props) {
   const [teams, setTeams] = useState<Record<string, PlayerStat[]>>({});
-  const [matchInfo, setMatchInfo] = useState<any>(null);
+  const [matchInfo, setMatchInfo] = useState<{ match_mode: string; winning_team: string } | null>(null);
+  const router = useRouter();
 
   useEffect(() => {
     if (!matchId || !isOpen) return;
 
     async function fetchStats() {
-      const res = await fetch(`/api/match/${matchId}`);
+      const res = await fetch(`/api/match-scoreboard/${matchId}`);
+      if (!res.ok) {
+        console.error(`Failed to fetch scoreboard: ${res.status}`);
+        return;
+      }
       const data = await res.json();
-
       setTeams(data.teams || {});
       setMatchInfo(data.match || null);
     }
@@ -44,7 +50,6 @@ export default function MatchScoreboardModal({ matchId, isOpen, onClose }: Props
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
       <div className="bg-white dark:bg-neutral-900 p-6 rounded shadow-lg w-11/12 max-w-3xl max-h-[80vh] overflow-y-auto">
-
         <h2 className="text-xl font-bold mb-4">
           Match {matchId} Scoreboard
         </h2>
@@ -66,7 +71,6 @@ export default function MatchScoreboardModal({ matchId, isOpen, onClose }: Props
         {Object.entries(teams).map(([team, players]) => (
           <div key={team} className="mb-6">
             <h3 className="font-semibold text-lg mb-2">{team}</h3>
-
             <table className="w-full table-auto border-collapse border border-gray-300 dark:border-gray-700">
               <thead>
                 <tr className="bg-gray-200 dark:bg-neutral-800">
@@ -82,8 +86,9 @@ export default function MatchScoreboardModal({ matchId, isOpen, onClose }: Props
               </thead>
               <tbody>
                 {players.map((p, i) => (
-                  <tr key={i}>
-                    <td className="border px-2 py-1">{p.username}</td>
+                  <tr key={i} className="hover:bg-gray-100 dark:hover:bg-neutral-800 cursor-pointer"
+                      onClick={() => router.push(`/player/${p.player_id}`)}>
+                    <td className="border px-2 py-1 text-blue-600 underline">{p.username}</td>
                     <td className="border px-2 py-1">{p.hero_name}</td>
                     <td className="border px-2 py-1">{p.kills}</td>
                     <td className="border px-2 py-1">{p.deaths}</td>

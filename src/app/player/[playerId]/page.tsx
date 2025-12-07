@@ -8,6 +8,11 @@ interface Player {
   total_matches_played: number;
   total_wins: number;
   total_losses: number;
+  mostPlayedHero?: {
+    hero_id: number;
+    hero_name: string;
+    matches_played: number;
+  } | null;
 }
 
 interface Match {
@@ -30,7 +35,6 @@ interface PlayerPageProps {
 export default async function PlayerPage({ params }: PlayerPageProps) {
   const playerId = Number(params.playerId);
 
-  // Fetch player info
   const [playerRows] = await db.query<Player & RowDataPacket[]>(
     `SELECT username, total_matches_played, total_wins, total_losses
      FROM Players
@@ -48,7 +52,6 @@ export default async function PlayerPage({ params }: PlayerPageProps) {
     total_losses: row.total_losses,
   };
 
-  // Fetch recent matches
   const [matchesRows] = await db.query<Match & RowDataPacket[]>(
     `SELECT pm.match_id, pm.hero_id, h.hero_name, pm.kills, pm.deaths, pm.assists,
             pm.damage_done, pm.healing_done, m.match_mode, m.winning_team
@@ -73,6 +76,28 @@ export default async function PlayerPage({ params }: PlayerPageProps) {
     match_mode: m.match_mode,
     winning_team: m.winning_team,
   }));
+
+  const [mostPlayedHeroRows] = await db.query<
+    { hero_id: number; hero_name: string; matches_played: number } & RowDataPacket[]
+  >(
+    `SELECT pm.hero_id, h.hero_name, COUNT(*) AS matches_played
+     FROM PlayerMatchStats pm
+     JOIN Heroes h ON pm.hero_id = h.hero_id
+     WHERE pm.player_id = ?
+     GROUP BY pm.hero_id
+     ORDER BY matches_played DESC
+     LIMIT 1`,
+    [playerId]
+  );
+
+  const mostPlayedHero = mostPlayedHeroRows[0] || null;
+  if (mostPlayedHero) {
+    playerInfo.mostPlayedHero = {
+      hero_id: mostPlayedHero.hero_id,
+      hero_name: mostPlayedHero.hero_name,
+      matches_played: mostPlayedHero.matches_played,
+    };
+  }
 
   return <PlayerPageClient playerInfo={playerInfo} matches={matches} playerId={playerId} />;
 }

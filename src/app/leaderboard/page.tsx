@@ -2,7 +2,21 @@ import { db } from "../lib/db";
 
 export const dynamic = "force-dynamic";
 
-export default async function LeaderboardPage() {
+interface Props {
+  searchParams?: { page?: string };
+}
+
+export default async function LeaderboardPage({ searchParams }: Props) {
+  const page = parseInt(searchParams?.page || "1", 10);
+  const pageSize = 20;
+  const offset = (page - 1) * pageSize;
+
+  const [countResult] = await db.query(
+    `SELECT COUNT(*) as total FROM players WHERE total_matches_played > 10`
+  ) as any;
+  const totalPlayers = countResult[0].total;
+  const totalPages = Math.ceil(totalPlayers / pageSize);
+
   const [players] = await db.query(
     `SELECT 
         player_id,
@@ -12,8 +26,10 @@ export default async function LeaderboardPage() {
         total_losses,
         (total_wins / NULLIF(total_matches_played, 0)) AS winrate
      FROM players
-     WHERE total_matches_played > 0
-     ORDER BY winrate DESC, total_matches_played DESC`
+     WHERE total_matches_played > 10
+     ORDER BY winrate DESC, total_matches_played DESC
+     LIMIT ? OFFSET ?`,
+    [pageSize, offset]
   ) as any;
 
   return (
@@ -36,11 +52,9 @@ export default async function LeaderboardPage() {
           <tbody>
             {players.map((p: any, index: number) => (
               <tr key={p.player_id} className="border-b hover:bg-gray-50">
-                <td className="p-3">{index + 1}</td>
+                <td className="p-3">{offset + index + 1}</td>
                 <td className="p-3">{p.username || "Unknown"}</td>
-                <td className="p-3">
-                  {(p.winrate * 100).toFixed(1)}%
-                </td>
+                <td className="p-3">{(p.winrate * 100).toFixed(1)}%</td>
                 <td className="p-3">{p.total_wins}</td>
                 <td className="p-3">{p.total_losses}</td>
                 <td className="p-3">{p.total_matches_played}</td>
@@ -48,6 +62,21 @@ export default async function LeaderboardPage() {
             ))}
           </tbody>
         </table>
+      </div>
+
+      {/* Pagination */}
+      <div className="mt-6 flex justify-center gap-3">
+        {Array.from({ length: totalPages }, (_, i) => (
+          <a
+            key={i + 1}
+            href={`?page=${i + 1}`}
+            className={`px-3 py-1 border rounded ${
+              page === i + 1 ? "bg-blue-500 text-white" : "bg-white text-blue-500"
+            }`}
+          >
+            {i + 1}
+          </a>
+        ))}
       </div>
     </div>
   );

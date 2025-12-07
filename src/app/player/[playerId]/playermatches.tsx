@@ -1,9 +1,14 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import MatchScoreboardModal from "../../components/MatchScoreboardModal";
 import Image from "next/image";
 
+interface MostPlayedHero {
+  hero_id: number;
+  hero_name: string;
+  matches_played: number;
+}
 
 interface Match {
   match_id: number;
@@ -20,9 +25,10 @@ interface Match {
 
 interface Props {
   matches: Match[];
+  mostPlayedHero?: MostPlayedHero | null;
 }
 
-export default function PlayerMatches({ matches }: Props) {
+export default function PlayerMatches({ matches, mostPlayedHero }: Props) {
   const [selectedMatchId, setSelectedMatchId] = useState<number | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
 
@@ -33,6 +39,23 @@ export default function PlayerMatches({ matches }: Props) {
 
   return (
     <>
+      {mostPlayedHero && (
+        <div className="mb-6 p-4 bg-gray-100 dark:bg-neutral-800 rounded flex items-center space-x-4">
+          <Image
+            src={`/hero-icons/${mostPlayedHero.hero_name}.png`}
+            alt={mostPlayedHero.hero_name}
+            width={48}
+            height={48}
+            className="rounded"
+          />
+          <div>
+            <h2 className="text-lg font-semibold">Most Played Hero</h2>
+            <p>
+              {mostPlayedHero.hero_name} — {mostPlayedHero.matches_played} matches
+            </p>
+          </div>
+        </div>
+      )}
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         {matches.map((match) => (
@@ -66,6 +89,7 @@ export default function PlayerMatches({ matches }: Props) {
           </div>
         ))}
       </div>
+
       <MatchScoreboardModal
         matchId={selectedMatchId}
         isOpen={isModalOpen}

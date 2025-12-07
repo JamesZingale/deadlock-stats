@@ -4,9 +4,16 @@ import { useState } from "react";
 import SessionComparisonModal from "./SessionComparisonModal";
 import PlayerMatches from "../player/[playerId]/playermatches";
 
+interface MostPlayedHero {
+  hero_id: number;
+  hero_name: string;
+  matches_played: number;
+}
+
 interface Match {
   match_id: number;
   hero_id: number;
+  hero_name: string;
   kills: number;
   deaths: number;
   assists: number;
@@ -21,6 +28,7 @@ interface Player {
   total_matches_played: number;
   total_wins: number;
   total_losses: number;
+  mostPlayedHero?: MostPlayedHero | null;
 }
 
 interface Props {
@@ -104,7 +112,7 @@ export default function PlayerPageClient({ playerInfo, matches, playerId }: Prop
       />
 
       <h2 className="text-xl font-semibold mb-2">Recent Matches</h2>
-      <PlayerMatches matches={matches} />
+      <PlayerMatches matches={matches} mostPlayedHero={playerInfo.mostPlayedHero} />
     </div>
   );
 }

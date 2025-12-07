@@ -6,6 +6,7 @@ import Link from 'next/link';
 
 export default function HomePage() {
   const [query, setQuery] = useState('');
+  const [seedId, setSeedId] = useState('');
   const router = useRouter();
 
   const handleSearch = async (e: React.FormEvent) => {
@@ -27,13 +28,37 @@ export default function HomePage() {
     }
   };
 
-  return (
-    <div className="flex-1 flex flex-col min-h-[calc(100vh-80px)] p-8 text-black" style={{ backgroundColor: 'rgba(136, 166, 191, 0.8)' }}>
+  const handleSeedPlayer = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!seedId) return alert('Enter a player_id first');
 
-      <div className="flex flex-col items-center gap-32"> 
+    try {
+      const res = await fetch(`/api/seed-player?account_id=${encodeURIComponent(seedId)}`);
+      const data = await res.json();
+
+      if (!res.ok) {
+        alert(`Error seeding player: ${data.error}`);
+        return;
+      }
+
+      alert(`Player seeded successfully`);
+    } catch (err) {
+      console.error('Error seeding player:', err);
+      alert('Failed to seed player');
+    }
+  };
+
+  return (
+    <div
+      className="flex-1 flex flex-col min-h-[calc(100vh-80px)] p-8 text-black"
+      style={{ backgroundColor: 'rgba(136, 166, 191, 0.8)' }}
+    >
+      <div className="flex flex-col items-center gap-16">
+
         {/* Search Section */}
-        <div className="flex flex-col items-center mt-8">
+        <div className="flex flex-col items-center ">
           <p className="mb-4 text-xl font-semibold text-black">Search for a player's profile</p>
+
           <form onSubmit={handleSearch} className="flex gap-2 w-full max-w-md">
             <input
               type="text"
@@ -71,6 +96,28 @@ export default function HomePage() {
             </Link>
           </div>
         </div>
+
+        {/* Seed Player Section */}
+        <div className="flex flex-col items-center mt-20">
+          <p className="mb-4 text-xl font-semibold text-black">Seed Player into Database</p>
+
+          <form onSubmit={handleSeedPlayer} className="flex gap-2 w-full max-w-md">
+            <input
+              type="text"
+              placeholder="Enter Player ID"
+              value={seedId}
+              onChange={(e) => setSeedId(e.target.value)}
+              className="flex-1 rounded px-3 py-2 text-black focus:outline-none focus:ring-2 focus:ring-cyan-400"
+            />
+            <button
+              type="submit"
+              className="bg-green-500 text-black px-4 py-2 rounded hover:bg-green-400 transition-colors"
+            >
+              Seed Player
+            </button>
+          </form>
+        </div>
+
       </div>
     </div>
   );
